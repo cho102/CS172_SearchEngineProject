@@ -14,7 +14,6 @@ reddit = praw.Reddit(client_id='H4-PUXnutVeqaLmkQwfYMA',
                      password='Wrx654xrw!',)
 
 
-
 t0 =time.time()
 
 top_posts = reddit.subreddit("nfl").new(limit=2000)
