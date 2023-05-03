@@ -6,11 +6,6 @@ from logging.handlers import RotatingFileHandler
 import json
 import sys
 
-reddit = praw.Reddit(client_id='H4-PUXnutVeqaLmkQwfYMA',
-                     client_secret='WNLr1bNj4GXoIJHGn3-OSjTrlY6uZQ',
-                     user_agent='prawtestrun',
-                     username='SevetZor',
-                     password='Wrx654xrw!',)
 
 
 t0 =time.time()
