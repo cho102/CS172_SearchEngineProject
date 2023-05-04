@@ -63,7 +63,7 @@ for post in top:
     
     with open(file_name, "a") as f:
         json.dump(sub_dict, f)
-        f.write(",\n")
+        f.write("\n")
     
     if os.path.getsize(file_name) >= 10000000:
         print("\n[Current file reached " + str(round(os.path.getsize(file_name)/(1024*1024)), 2) + " MB, creating a new file.]\n")
