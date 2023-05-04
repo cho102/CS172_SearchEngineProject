@@ -1,6 +1,7 @@
 import praw
 import json
 import os
+import sys
 
 list_of_items = []
 fields = ('created_utc',
@@ -18,10 +19,14 @@ fields = ('created_utc',
           )
 comm_fields = ('body')
 
-userClientID = input("Enter Reddit script app client ID: ")
-userClientSecret = input("Enter Reddit script app client secret: ")
-subreddit = input("Enter subreddit name to crawl: ")
-postLimit = input("Enter the number of posts to crawl: ")
+# userClientID = input("Enter Reddit script app client ID: ")
+# userClientSecret = input("Enter Reddit script app client secret: ")
+# subreddit = input("Enter subreddit name to crawl: ")
+# postLimit = input("Enter the number of posts to crawl: ")
+userClientID = sys.argv[1]
+userClientSecret = sys.argv[2]
+subreddit = sys.argv[3]
+postLimit = sys.argv[4]
 
 counter = 1
 file_name = f"reddit_{subreddit}_data_{counter}.json"
