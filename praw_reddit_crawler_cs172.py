@@ -74,7 +74,7 @@ else:
             json.dump(sub_dict, f)
             f.write("\n")
         
-        if os.path.getsize(file_name) >= 10000:
+        if os.path.getsize(file_name) >= 10000000:
             currentFileSize = round(os.path.getsize(file_name)/(1024*1024), 2)
             print("\n[" + file_name + " reached " + str(currentFileSize) + " MB, creating a new file.]\n")
             counter += 1
