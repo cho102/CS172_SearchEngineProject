@@ -19,21 +19,30 @@ fields = ('created_utc',
           )
 comm_fields = ('body')
 
-# userClientID = input("Enter Reddit script app client ID: ")
-# userClientSecret = input("Enter Reddit script app client secret: ")
-# subreddit = input("Enter subreddit name to crawl: ")
-# postLimit = input("Enter the number of posts to crawl: ")
 userClientID = sys.argv[1]
 userClientSecret = sys.argv[2]
 subreddit = sys.argv[3]
 postLimit = sys.argv[4]
+
+if int(postLimit) < 0:
+    print("Number of posts to crawl was negative, setting number of posts to crawl to absolute value")
+    postLimit = abs(int(postLimit))
+    print("Number of posts to crawl was set to: " + str(postLimit))
+elif int(postLimit) == 0:
+    print("Number of posts to crawl was set 0, setting number of posts to crawl to None")
+    postLimit = None
+    print("Number of posts to crawl was set to: " + str(postLimit))
 
 counter = 1
 file_name = f"reddit_{subreddit}_data_{counter}.json"
 
 reddit = praw.Reddit(client_id=userClientID, client_secret=userClientSecret, user_agent=subreddit + "Scrape")
 
-top = reddit.subreddit(subreddit).top(limit=int(postLimit))
+if postLimit == None:
+    top = reddit.subreddit(subreddit).top(limit=postLimit)
+else:
+    top = reddit.subreddit(subreddit).top(limit=int(postLimit))
+
 print("\nStarting crawling r/" + subreddit + ".")
 for post in top:
     to_dict = vars(post)
@@ -54,7 +63,7 @@ for post in top:
     
     with open(file_name, "a") as f:
         json.dump(sub_dict, f)
-        f.write("\n")
+        f.write(",\n")
     
     if os.path.getsize(file_name) >= 10000000:
         print("\n[Current file reached " + str(round(os.path.getsize(file_name)/(1024*1024)), 2) + " MB, creating a new file.]\n")
