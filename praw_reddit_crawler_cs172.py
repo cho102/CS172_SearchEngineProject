@@ -39,6 +39,8 @@ elif int(postLimit) == 0:
 
 counter = 1
 file_name = f"reddit_{subreddit}_{postTypeFilter.lower()}_data_{counter}.json"
+with open(file_name, "a") as f:
+    f.write("[\n")
 
 reddit = praw.Reddit(client_id=userClientID, client_secret=userClientSecret, user_agent=subreddit + "Scrape", username=redditUsername, password=redditPassword)
 
@@ -70,7 +72,16 @@ except ResponseException:
 else:
     print("\nValid Reddit account and app found for user: " + redditUsername)
     print("\nStarting crawling r/" + subreddit + ".")
+    post_cnt = 0
+    postHolder = []
+
     for post in postType:
+        post_cnt += 1
+        postHolder.append(post)
+
+    currPostCnt = 0
+    for post in postHolder:
+        currPostCnt += 1
         to_dict = vars(post)
         sub_dict = {field:to_dict[field] for field in fields}
         post.comments.replace_more(limit=None)
@@ -89,12 +100,26 @@ else:
         
         with open(file_name, "a") as f:
             json.dump(sub_dict, f)
-            f.write("\n")
         
         if os.path.getsize(file_name) >= 10000000:
-            currentFileSize = round(os.path.getsize(file_name)/(1024*1024), 2)
-            print("\n[" + file_name + " reached " + str(currentFileSize) + " MB, creating a new file.]")
-            counter += 1
-            file_name = f"reddit_{subreddit}_{postTypeFilter.lower()}_data_{counter}.json"
-    #print("\nFile size (in MB): " + str(round(os.path.getsize(file_name)/(1024*1024), 2)))
-    print("Finished crawling r/" + subreddit + ".\n")
+          with open(file_name, "a") as f:
+            f.write("\n]")
+          currentFileSize = round(os.path.getsize(file_name)/(1024*1024), 2)
+          print("\n[" + file_name + " reached " + str(currentFileSize) + " MB, creating a new file.]")
+          counter += 1
+          file_name = f"reddit_{subreddit}_{postTypeFilter.lower()}_data_{counter}.json"
+          with open(file_name, "a") as f:
+            f.write("[\n")
+        
+        if currPostCnt == post_cnt:
+            with open(file_name, 'rb+') as f:
+                f.seek(-1, os.SEEK_END)
+                f.truncate()
+            with open(file_name, "a") as f:
+                f.write("}\n]")
+                print("Finished crawling r/" + subreddit + ".\n")
+                quit()    
+        else:
+            with open(file_name, "a") as f:
+                f.write(",\n")
+print("end of loop, something went wrong")
