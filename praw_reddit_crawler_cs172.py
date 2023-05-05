@@ -26,6 +26,7 @@ redditUsername = sys.argv[3]
 redditPassword = sys.argv[4]
 subreddit = sys.argv[5]
 postLimit = sys.argv[6]
+postTypeFilter = sys.argv[7]
 
 if int(postLimit) < 0:
     print("Number of posts to crawl was negative, setting number of posts to crawl to absolute value")
@@ -37,14 +38,30 @@ elif int(postLimit) == 0:
     print("Number of posts to crawl was set to: " + str(postLimit))
 
 counter = 1
-file_name = f"reddit_{subreddit}_data_{counter}.json"
+file_name = f"reddit_{subreddit}_{postTypeFilter.lower()}_data_{counter}.json"
 
 reddit = praw.Reddit(client_id=userClientID, client_secret=userClientSecret, user_agent=subreddit + "Scrape", username=redditUsername, password=redditPassword)
 
 if postLimit == None:
-    top = reddit.subreddit(subreddit).top(limit=postLimit)
+    if postTypeFilter.lower() == "top":
+        postType = reddit.subreddit(subreddit).top(limit=postLimit)
+    elif postTypeFilter.lower() == "hot":
+        postType = reddit.subreddit(subreddit).hot(limit=postLimit)
+    elif postTypeFilter.lower() == "new":
+        postType = reddit.subreddit(subreddit).new(limit=postLimit)
+    else:
+        print("Failed to crawl, post filter was invalid.")
+        quit()
 else:
-    top = reddit.subreddit(subreddit).top(limit=int(postLimit))
+    if postTypeFilter.lower() == "top":
+        postType = reddit.subreddit(subreddit).top(limit=int(postLimit))
+    elif postTypeFilter.lower() == "hot":
+        postType = reddit.subreddit(subreddit).hot(limit=int(postLimit))
+    elif postTypeFilter.lower() == "new":
+        postType = reddit.subreddit(subreddit).new(limit=int(postLimit))
+    else:
+        print("Failed to crawl, post filter was invalid.")
+        quit()
 
 try: # referenced https://stackoverflow.com/a/62110680
     reddit.user.me()
@@ -53,7 +70,7 @@ except ResponseException:
 else:
     print("\nValid Reddit account and app found for user: " + redditUsername)
     print("\nStarting crawling r/" + subreddit + ".")
-    for post in top:
+    for post in postType:
         to_dict = vars(post)
         sub_dict = {field:to_dict[field] for field in fields}
         post.comments.replace_more(limit=None)
@@ -76,8 +93,8 @@ else:
         
         if os.path.getsize(file_name) >= 10000000:
             currentFileSize = round(os.path.getsize(file_name)/(1024*1024), 2)
-            print("\n[" + file_name + " reached " + str(currentFileSize) + " MB, creating a new file.]\n")
+            print("\n[" + file_name + " reached " + str(currentFileSize) + " MB, creating a new file.]")
             counter += 1
-            file_name = f"reddit_{subreddit}_data_{counter}.json"
+            file_name = f"reddit_{subreddit}_{postTypeFilter.lower()}_data_{counter}.json"
     #print("\nFile size (in MB): " + str(round(os.path.getsize(file_name)/(1024*1024), 2)))
-    print("\nFinished crawling r/" + subreddit + ".")
+    print("Finished crawling r/" + subreddit + ".\n")
