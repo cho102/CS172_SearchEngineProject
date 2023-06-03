@@ -13,12 +13,11 @@ from org.apache.lucene.index import FieldInfo, IndexWriter, IndexWriterConfig, I
 from org.apache.lucene.search import IndexSearcher, BoostQuery, Query
 from org.apache.lucene.search.similarities import BM25Similarity
 from datetime import datetime
-from flask import request, Flask, render_template
+from flask import request, Flask, render_template, redirect
 
 app = Flask(__name__)
 
 finalDocJson = 'group01_reddit_data.json'
-#finalDocJson = 'nfl_data_1_SAMPLE_SHORTENED.json'
 
 finalDoc = []
 with open(finalDocJson, 'r') as index_file:
@@ -60,26 +59,33 @@ def retrieve(storedir, query):
 
     topDocs = searcher.search(parsed_query, 10).scoreDocs
     topkdocs = []
+    redditURLPrefix = "https://www.reddit.com"
     for hit in topDocs:
         doc = searcher.doc(hit.doc)
         comments = doc.get("comments")
         comments_list = ast.literal_eval(comments) if comments else []
         first_comment = comments_list[0] if comments_list else {}
-        topkdocs.append({
+        post_url = redditURLPrefix + doc.get("permalink")
+        newDoc = {
             "documentScore": hit.score,
             "title": doc.get("title"),
             "body": first_comment.get('body', ''),
-            "post_time": datetime.fromtimestamp(float(doc.get("created_utc"))).strftime('%Y-%m-%d %H:%M:%S') # referenced https://stackoverflow.com/a/46914259
-        })
+            "post_date": datetime.fromtimestamp(float(doc.get("created_utc"))).strftime('%Y-%m-%d %H:%M:%S'), # referenced https://stackoverflow.com/a/46914259
+            "post_score": doc.get("score"),
+            "num_comments": doc.get("num_comments"),
+            "url": post_url
+        }
+        if not newDoc in topkdocs:    
+            topkdocs.append(newDoc)
     return topkdocs
 
 @app.route("/")
 def home():
-    return 'hello!~!!'
+    return redirect("/input")
 
-@app.route("/abc")
-def abc():
-    return 'hello alien'
+@app.errorhandler(404)
+def everythingelse(e):
+    return redirect("/input")
 
 @app.route('/input', methods = ['POST', 'GET'])
 def input():
@@ -88,7 +94,8 @@ def input():
 @app.route('/output', methods = ['POST', 'GET'])
 def output():
     if request.method == 'GET':
-        return f"Nothing"
+        #return f"Nothing"
+        return redirect("/input")
     if request.method == 'POST':
         form_data = request.form
         query = form_data['query']
