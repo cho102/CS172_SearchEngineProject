@@ -1,0 +1,14 @@
+{% for item in lucene_output %}
+<h2> Score: {{item['documentScore']}}</h2>
+<h1> Reddit Post Title: {{item['title']}}</h1>
+<h1> Reddit Body: {{item['body']}}</h1>
+<h1> Post Date: {{item['post_date']}}</h1>
+<h1> Reddit Post Score: {{item['post_score']}}</h1>
+<h1> Number of Comments: {{item['num_comments']}}</h1>
+<a href={{item['url']}}>{{item['url']}}</a>
+<hr>
+{% endfor %}
+
+<form action="/input" method = "POST">
+    <p><input type = "submit" value = "Search Again" /></p>
+</form>
