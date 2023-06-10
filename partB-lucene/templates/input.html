@@ -3,6 +3,10 @@
 <form action="/output" method = "POST">
     <p><span style="font-weight:bold">Title Query:</span> <input type = "search" placeholder="Enter title query..." name = "query" style="width:300px"/></p>
     <!-- <p><span style="font-weight:bold">Comments Query:</span> <input type = "search" placeholder="Enter comments query..." name = "comments-query" style="width:300px"/></p> -->
+    <br>
+    <p>Search date range query only works if both fields have valid time ranges. Start date must be before end date.</p>
+    <p><span style="font-weight:bold">Search Date Range Start:</span> <input type = "search" placeholder="Enter range query with format 'YYYY-MM-DD'" name = "search-range-start-query" style="width:300px"/></p>
+    <p><span style="font-weight:bold">Search Date Range End:</span> <input type = "search" placeholder="Enter range query with format 'YYYY-MM-DD'" name = "search-range-end-query" style="width:300px"/></p>
     <hr/>
     <p><input type = "submit" name="button" value="Search by document score"/></p>
     <p><input type = "submit" name="button" value="Search by document score ascending post date"/></p>

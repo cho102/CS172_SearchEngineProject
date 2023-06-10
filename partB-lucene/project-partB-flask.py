@@ -13,6 +13,7 @@ from org.apache.lucene.index import FieldInfo, IndexWriter, IndexWriterConfig, I
 from org.apache.lucene.search import IndexSearcher, BoostQuery, Query
 from org.apache.lucene.search.similarities import BM25Similarity
 from datetime import datetime
+import time
 import operator
 
 from flask import request, Flask, render_template, redirect, flash, session
@@ -59,6 +60,8 @@ def retrieve(storedir, query):
     parser = QueryParser('title', StandardAnalyzer())
     parsed_query = parser.parse(query)
 
+    print(parsed_query)
+
     topDocs = searcher.search(parsed_query, 10).scoreDocs
     topkdocs = []
     redditURLPrefix = "https://www.reddit.com"
@@ -82,6 +85,14 @@ def retrieve(storedir, query):
             topkdocs.append(newDoc)
     return topkdocs
 
+def validateDateInput(dateInput): # referenced https://stackoverflow.com/a/16870699
+    try:
+        if dateInput != datetime.strptime(dateInput, "%Y-%m-%d").strftime('%Y-%m-%d'):
+            raise ValueError
+        return True
+    except ValueError:
+        return False
+
 @app.route("/")
 def home():
     return redirect("/input")
@@ -103,6 +114,18 @@ def output():
         query = form_data['query']
         if (query == ""):
             return redirect("/input")
+        startDate = form_data['search-range-start-query']
+        endDate = form_data['search-range-end-query']
+        startEndDateQuery = ''
+        if (startDate != "" and endDate !=""):
+            if (validateDateInput(startDate) and validateDateInput(endDate)):
+                dateSearchCombine = ' TO '
+                startDateUnix = time.mktime(datetime.strptime(startDate, "%Y-%m-%d").timetuple())
+                endDateUnix = time.mktime(datetime.strptime(endDate, "%Y-%m-%d").timetuple())
+                if (endDateUnix > startDateUnix):
+                    startEndDateQuery = str(int(startDateUnix)) + dateSearchCombine + str(int(endDateUnix))
+        if (startEndDateQuery != ""):
+            query = query + ' AND created_utc:[' + startEndDateQuery + ']'
         print(f"this is the query: {query}")
         lucene.getVMEnv().attachCurrentThread()
         docs = retrieve('lucene_partB_index/', str(query))
