@@ -13,13 +13,14 @@ from org.apache.lucene.index import FieldInfo, IndexWriter, IndexWriterConfig, I
 from org.apache.lucene.search import IndexSearcher, BoostQuery, Query
 from org.apache.lucene.search.similarities import BM25Similarity
 from datetime import datetime
-from flask import request, Flask, render_template, redirect
 import operator
 
+from flask import request, Flask, render_template, redirect, flash, session
+
 app = Flask(__name__)
+app.secret_key = 'class041'
 
 finalDocJson = 'group01_reddit_data.json'
-
 finalDoc = []
 with open(finalDocJson, 'r') as index_file:
     finalDoc = json.load(index_file)
@@ -96,11 +97,12 @@ def input():
 @app.route('/output', methods = ['POST', 'GET'])
 def output():
     if request.method == 'GET':
-        #return f"Nothing"
         return redirect("/input")
     if request.method == 'POST':
         form_data = request.form
         query = form_data['query']
+        if (query == ""):
+            return redirect("/input")
         print(f"this is the query: {query}")
         lucene.getVMEnv().attachCurrentThread()
         docs = retrieve('lucene_partB_index/', str(query))
