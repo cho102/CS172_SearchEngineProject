@@ -1,11 +1,14 @@
 {% for item in lucene_output %}
-<h2> Score: {{item['documentScore']}}</h2>
-<h1> Reddit Post Title: {{item['title']}}</h1>
-<h1> Reddit Body: {{item['body']}}</h1>
-<h1> Post Date: {{item['post_date']}}</h1>
-<h1> Reddit Post Score: {{item['post_score']}}</h1>
-<h1> Number of Comments: {{item['num_comments']}}</h1>
-<a href={{item['url']}}>{{item['url']}}</a>
+<div style="padding-bottom:10px">
+    <div id="result-header">
+        <a href={{item['url']}} id="post-title" style="font-weight:bold; font-size: 24px">{{item['title']}}</a>
+    </div>
+    <div id="result-contents">
+        <div>{{item['post_date']}} – {{item['body']}}</div>
+        <div>Document Score: {{item['documentScore']}}</div>
+        <div>Reddit Post Score: {{item['post_score']}}</div>
+    </div>
+</div>
 <hr>
 {% endfor %}
 
