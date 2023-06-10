@@ -134,9 +134,9 @@ def output():
         if (form_data['button'] == 'Search by document score'):
             pass
         elif (form_data['button'] == 'Search by document score ascending post date'):
-            docs.sort(key=operator.itemgetter("created_utc"), reverse=True);
+            docs.sort(key=operator.itemgetter("created_utc"), reverse=True)
         else:
-            docs.sort(key=operator.itemgetter("created_utc"), reverse=False);
+            docs.sort(key=operator.itemgetter("created_utc"), reverse=False)
         print(docs)
         
         return render_template('output.html',lucene_output = docs)
