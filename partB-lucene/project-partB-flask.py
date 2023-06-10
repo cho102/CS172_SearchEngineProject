@@ -21,7 +21,8 @@ from flask import request, Flask, render_template, redirect, flash, session
 app = Flask(__name__)
 app.secret_key = 'class041'
 
-finalDocJson = 'group01_reddit_data.json'
+# finalDocJson = 'group01_reddit_data.json'
+finalDocJson = 'sample_tennis_data.json'
 finalDoc = []
 with open(finalDocJson, 'r') as index_file:
     finalDoc = json.load(index_file)
@@ -128,7 +129,8 @@ def output():
             query = query + ' AND created_utc:[' + startEndDateQuery + ']'
         print(f"this is the query: {query}")
         lucene.getVMEnv().attachCurrentThread()
-        docs = retrieve('lucene_partB_index/', str(query))
+        #docs = retrieve('lucene_partB_index/', str(query))
+        docs = retrieve('sample_lucene_partB_index/', str(query))
         if (form_data['button'] == 'Search by document score'):
             pass
         elif (form_data['button'] == 'Search by document score ascending post date'):
