@@ -14,6 +14,7 @@ from org.apache.lucene.search import IndexSearcher, BoostQuery, Query
 from org.apache.lucene.search.similarities import BM25Similarity
 from datetime import datetime
 from flask import request, Flask, render_template, redirect
+import operator
 
 app = Flask(__name__)
 
@@ -73,7 +74,8 @@ def retrieve(storedir, query):
             "post_date": datetime.fromtimestamp(float(doc.get("created_utc"))).strftime('%Y-%m-%d %H:%M:%S'), # referenced https://stackoverflow.com/a/46914259
             "post_score": doc.get("score"),
             "num_comments": doc.get("num_comments"),
-            "url": post_url
+            "url": post_url,
+            "created_utc": doc.get("created_utc"),
         }
         if not newDoc in topkdocs:    
             topkdocs.append(newDoc)
@@ -102,6 +104,12 @@ def output():
         print(f"this is the query: {query}")
         lucene.getVMEnv().attachCurrentThread()
         docs = retrieve('lucene_partB_index/', str(query))
+        if (form_data['button'] == 'Search by document score'):
+            pass
+        elif (form_data['button'] == 'Search by document score ascending post date'):
+            docs.sort(key=operator.itemgetter("created_utc"), reverse=True);
+        else:
+            docs.sort(key=operator.itemgetter("created_utc"), reverse=False);
         print(docs)
         
         return render_template('output.html',lucene_output = docs)
